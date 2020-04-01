@@ -32,8 +32,10 @@ class ViewController: UIViewController {
         }
         
 //        alterarDados()
-        criarUniversidade()
-        deletarDados()
+//        criarUniversidade()
+//        deletarDados()
+//        cadastrarPessoasArg(nome: "Cássia", curso: "CC", tia: "32233223")
+        alterarDadoArg(nome: "Cássia", nomeAlt: "Jurema")
     }
     
     func cadastrarPessoas() {
@@ -51,12 +53,31 @@ class ViewController: UIViewController {
         db.save(aluno, completionHandler: {_,_ in})
     }
     
+    func cadastrarPessoasArg(nome: String, curso: String, tia: String) {
+        let aluno = CKRecord(recordType: "Aluno")
+        aluno.setValue(nome, forKey: "Nome")
+        aluno.setValue(curso, forKey: "Curso")
+        aluno.setValue(tia, forKey: "TIA")
+        db.save(aluno, completionHandler: {_,_ in})
+    }
+    
     func alterarDados() {
         let predicadoCassia = NSPredicate(format: "Nome == 'Cássia'")
         let queryCassia = CKQuery(recordType: "Aluno", predicate: predicadoCassia)
         db.perform(queryCassia, inZoneWith: nil) { (records, error) in
             
             records?[0].setValue("Jurema", forKey: "Nome")
+            self.db.save((records![0]), completionHandler: {_,_ in})
+            print(records?[0].value(forKey: "Nome"))
+        }
+    }
+    
+    func alterarDadoArg(nome:String, nomeAlt:String) {
+        let predicadoCassia = NSPredicate(format: "Nome == '\(nome)'")
+        let queryCassia = CKQuery(recordType: "Aluno", predicate: predicadoCassia)
+        db.perform(queryCassia, inZoneWith: nil) { (records, error) in
+            
+            records?[0].setValue("\(nomeAlt)", forKey: "Nome")
             self.db.save((records![0]), completionHandler: {_,_ in})
             print(records?[0].value(forKey: "Nome"))
         }
@@ -72,13 +93,22 @@ class ViewController: UIViewController {
         print("foi?")
     }
     
-    func referencia() {
-        let predicadoNath = NSPredicate(format: "Nome == 'Nath'")
-        let queryNath = CKQuery(recordType: "Aluno", predicate: predicadoNath)
-        db.perform(queryNath, inZoneWith: nil) { (record, error) in
-            
+    func deletarDadoArg(nome:String, nomeAlt:String, curso: String) {
+        let predicadoJurema = NSPredicate(format: "Nome == '\(nome)' AND Curso == '\(curso)'")
+        let queryJurema = CKQuery(recordType: "Aluno", predicate: predicadoJurema)
+        db.perform(queryJurema, inZoneWith: nil) { (record, error) in
+            let recordID = record?.first?.recordID
+            self.db.delete(withRecordID: recordID!, completionHandler: {_,_ in})
         }
+        print("foi?")
     }
+    
+//    func referencia() {
+//        let predicadoNath = NSPredicate(format: "Nome == 'Nath'")
+//        let queryNath = CKQuery(recordType: "Aluno", predicate: predicadoNath)
+//        db.perform(queryNath, inZoneWith: nil) { (record, error) in
+//        }
+//    }
     
     func criarUniversidade() {
         var facul = CKRecord(recordType: "Universidade")
